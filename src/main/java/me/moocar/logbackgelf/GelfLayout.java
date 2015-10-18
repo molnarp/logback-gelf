@@ -106,6 +106,7 @@ public class GelfLayout<E extends ILoggingEvent> extends LayoutBase<E> {
         map.put("short_message", shortMessageLayout.doLayout(logEvent));
 
         stackTraceField(map, logEvent);
+        exceptionField(map, logEvent);
 
         map.put("timestamp", logEvent.getTimeStamp() / 1000.0);
 
@@ -132,6 +133,14 @@ public class GelfLayout<E extends ILoggingEvent> extends LayoutBase<E> {
                     map.put("_line", String.valueOf(lastStack.getLineNumber()));
                 }
             }
+        }
+    }
+    
+    private void exceptionField(Map<String, Object> map, ILoggingEvent eventObject) {
+        IThrowableProxy throwableProxy = eventObject.getThrowableProxy();
+        if (throwableProxy != null && throwableProxy.getClassName() != null && 
+                ! "".equals(throwableProxy.getClassName())) {
+            map.put("_exception", throwableProxy.getClassName());
         }
     }
 
