@@ -2,11 +2,12 @@ logback-gelf
 ============
 
 A [Logback](http://logback.qos.ch/) appender that encodes logs to
-[GELF](https://www.graylog.org/resources/gelf-2/) and transports them
+[GELF](https://www.graylog.org/resources/gelf/) and transports them
 to [Graylog](https://www.graylog.org/) servers.
 
-**NOTE: Version 0.2 is NOT backwards compatible with previous versions
-  (<= 0.12). [Read about the changes](#v02-changes)**
+**Disclaimer: This repo is no longer maintained as of v0.3 as I've
+  stopped using Graylog (different job). Please reach out at
+  anthony@moocar.me if you wish to take over the repo**
 
 Dependency information
 -----------------------------------
@@ -17,7 +18,7 @@ Latest version:
 <dependency>
   <groupId>me.moocar</groupId>
   <artifactId>logback-gelf</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
 </dependency>
 ```
 
@@ -80,7 +81,7 @@ default values:
                 <additionalField>ipAddress:_ip_address</additionalField>
                 <additionalField>requestId:_request_id</additionalField>
                 <includeFullMDC>true</includeFullMDC>
-                <fieldType>_request_id:long</fieldType>
+                <fieldType>requestId:long</fieldType>
                 <!--Facility is not officially supported in GELF anymore, but you can use staticFields to do the same thing-->
                 <staticField class="me.moocar.logbackgelf.Field">
                   <key>_facility</key>
@@ -146,7 +147,7 @@ graylog transport.
 UDP can be configured using the
 `me.moocar.logbackgelf.GelfUDPAppender` appender. Once messages reach
 a certain size, they will be chunked according to the
-[gelf spec](https://www.graylog.org/resources/gelf-2/). A maximum of
+[gelf spec](https://www.graylog.org/resources/gelf/). A maximum of
 128 chunks can be sent per log. If the encoded log is bigger than
 that, the log will be dropped. Assuming the default 512 max packet
 size, this allows for 65536 bytes (64kb) total per log message
@@ -216,7 +217,7 @@ Extra features
 Additional Fields are extra k/v pairs that can be added to the GELF
 json, and thus searched as structured data using graylog. In the slf4j
 world, [MDC](http://logback.qos.ch/manual/mdc.html) (Mapped Diagnostic
-Context) is an excellent way of programattically adding fields to your
+Context) is an excellent way of programmatically adding fields to your
 GELF messages.
 
 Let's take an example of adding the ip address of the client to every
@@ -286,13 +287,13 @@ staticFields are fully structured and don't have this problem.
 ### Field type conversion
 
 You can configure a specific field to be converted to a numeric type.
-Key is the additional field key (and should thus begin with an
-underscore), value is the type to convert to. Currently supported
-types are ``int``, ``long``, ``float`` and ``double``.
+Key is the additional field key as inserted into the MDC, value is the
+type to convert to. Currently supported types are ``int``, ``long``, ``float`` and ``double``.
 
 ```xml
 <layout class="me.moocar.logbackgelf.GelfLayout">
-    <fieldType>_request_id:long</fieldType>
+    <additionalField>requestId:_request_id</additionalField>
+    <fieldType>requestId:long</fieldType>
 </layout>
 ```
 
@@ -373,7 +374,9 @@ compatibility. Here's a list of all the changes:
 Change Log
 --------------------------------------
 
-* Development version 0.3-SNAPSHOT (current Git `master`)
+* Development version 0.4-SNAPSHOT (current Git `master`)
+* Release [0.3] on 2016-Jan-19
+  * Add Structured Static Fields [#57](../../pull/57)
 * Release [0.2beta3] on 2015-May-31
   * Handle IO errors in UDP appender [#54](../../issues/54)
 * Release [0.2beta2] on 2015-Apr-06
